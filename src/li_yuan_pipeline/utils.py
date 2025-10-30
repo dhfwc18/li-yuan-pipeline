@@ -4,10 +4,7 @@
 from datetime import date, datetime
 
 
-def ce_date_to_roc_string(
-        ce_date: str | date | datetime,
-        separator: str = "/"
-    ) -> str:
+def ce_date_to_roc_string(ce_date: str | date | datetime, separator: str = "/") -> str:
     """
     Convert CE date to ROC date string format
 

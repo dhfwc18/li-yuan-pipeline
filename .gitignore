@@ -205,3 +205,4 @@ __marimo__/
 
 # Project data
 **/data/raw/*.parquet
+**/data/staging/*.duckdb

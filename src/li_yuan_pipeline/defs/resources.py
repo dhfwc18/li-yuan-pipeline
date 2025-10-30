@@ -5,6 +5,7 @@ from typing import Any
 
 import dagster as dg
 import requests
+from dagster_duckdb import DuckDBResource
 
 from li_yuan_pipeline.defs.assets.constants import LI_YUAN_URL
 
@@ -64,10 +65,14 @@ class OpenAPIResource(dg.ConfigurableResource):
         return response.json()
 
 
+main_database = DuckDBResource(database=dg.EnvVar("MAIN_DUCKDB_DATABASE"))
+
+
 @dg.definitions
 def resources():
     return dg.Definitions(
         resources={
             "li_yuan_api": OpenAPIResource(base_url=LI_YUAN_URL, verify_ssl=False),
+            "main_database": main_database,
         }
     )
