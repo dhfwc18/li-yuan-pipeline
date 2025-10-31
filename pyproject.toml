@@ -5,6 +5,8 @@ version = "0.1.0"
 dependencies = [
     "dagster==1.11.16",
     "dagster-duckdb>=0.27.16",
+    "matplotlib>=3.9.4",
+    "pandas>=2.3.3",
     "polars>=1.35.1",
     "pyarrow>=21.0.0",
 ]

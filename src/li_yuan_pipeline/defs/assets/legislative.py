@@ -6,7 +6,7 @@ from datetime import date, timedelta
 import dagster as dg
 import polars as pl
 
-from li_yuan_pipeline.defs.assets.constants import SPEECH_DATA_PATH_TEMPLATE
+from li_yuan_pipeline.defs.assets.constants import SPEECH_DATA_FILEPATH_TEMPLATE
 from li_yuan_pipeline.defs.partitions import monthly_partitions
 from li_yuan_pipeline.defs.resources import DuckDBResource, OpenAPIResource
 from li_yuan_pipeline.utils import ce_date_to_roc_string, roc_string_to_ce_date
@@ -68,7 +68,9 @@ def speech_file(
             .alias("speaker"),
         )
     )
-    df.write_parquet(SPEECH_DATA_PATH_TEMPLATE.format(partition=partition_date_string))
+    df.write_parquet(
+        SPEECH_DATA_FILEPATH_TEMPLATE.format(partition=partition_date_string)
+    )
 
     return None
 
@@ -89,7 +91,7 @@ def speech_data(
 
     # Partition setup
     partition_date_string = context.partition_key
-    path = SPEECH_DATA_PATH_TEMPLATE.format(partition=partition_date_string)
+    path = SPEECH_DATA_FILEPATH_TEMPLATE.format(partition=partition_date_string)
 
     # Load Parquet
     try:
@@ -185,7 +187,7 @@ def speaker_data(
 ) -> None:
     """Unique speaker data, loaded into DuckDB from speech data."""
     partition_date_string = context.partition_key
-    path = SPEECH_DATA_PATH_TEMPLATE.format(partition=partition_date_string)
+    path = SPEECH_DATA_FILEPATH_TEMPLATE.format(partition=partition_date_string)
 
     # Load Parquet
     try:
@@ -202,6 +204,11 @@ def speaker_data(
             pl.col("speaker"),
         ]
     ).unique()
+    df = df.drop_nulls(subset=["speaker_id"])
+
+    if df.is_empty():
+        context.log.info(f"No speaker data found in partition {partition_date_string}.")
+        return None
 
     context.log.debug(f"Unique speakers extracted: {df.height} rows.")
 
